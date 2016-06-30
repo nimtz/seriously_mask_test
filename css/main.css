@@ -12,3 +12,13 @@ img {
 #canvas {
     position        : absolute;
 }
+#translate_value {
+    color           : white;
+    background      : black;
+    font-family     : courier;
+    font-size       : 64px;
+    position        : absolute;
+    bottom          : 20px;
+    left            : 20px;
+    z-index         : 1;{}
+}
