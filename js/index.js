@@ -101,8 +101,8 @@
     function onrender () {
         if (state.isTweening) {
             if (state.do_translate) {
-                transformNode.translate(state.translate, 0);
                 updateTranslateValue();
+                transformNode.translate(state.translate, 0);
             }
             if (state.do_scale) {
                 transformNode.scale(state.scale);
@@ -150,7 +150,7 @@
         timeline = null;
     }
     function updateTranslateValue () {
-        val.innerText = state.translate.toFixed(3);
+        val.textContent = state.translate.toFixed(3);
     }
     function setupGUI () {
         var gui = new window.dat.GUI();
@@ -171,7 +171,7 @@
         gui.add(state, "do_translate");
         gui.add(state, "do_scale");
 
-        scale     = gui.add(state, "scale", 0, 2);
+        /*scale     = gui.add(state, "scale", 0, 2);
         translate = gui.add(state, "translate", -500, 500);
 
         scale.onChange(function (value) {
@@ -181,7 +181,7 @@
         translate.onChange(function (value) {
             updateTranslateValue();
             transformNode.translate(state.translate, 0);
-        });
+        });*/
 
         gui.add(state, "tween");
     }
