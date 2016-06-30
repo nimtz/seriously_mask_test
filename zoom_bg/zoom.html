@@ -1,0 +1,211 @@
+<html>
+    <head>
+    <title>Seriously.js Directional Motion Blur Example</title>
+    <style>
+        html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt,
+        var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video {
+            margin: 0;padding: 0;border: 0;font-size: 100% ;font: inherit;vertical-align: baseline; box-sizing: border-box
+        }
+        article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+            display: block
+        }
+        body {
+            line-height: 1
+        }
+        ol, ul {
+            list-style: none
+        }
+        blockquote, q {
+            quotes: none
+        }
+        blockquote: before, blockquote: after, q: before, q: after {
+            content: '';content: none
+        }
+        table {
+            border-collapse: collapse;
+            border-spacing: 0
+        }
+    </style>
+    <style>
+        body {
+            background:url("slideshow_bg_v4_5.jpg") no-repeat;
+            background-size:cover;
+        }
+        img, #canvas_pic {
+            display: none;
+        }
+
+        #bg {
+            width:100%;
+            height:auto;
+        }
+
+        #controls {
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        #controls input {
+            width: 400px;
+        }
+
+        #canvas {
+            position:absolute;
+            pointer-events:none;
+        }
+    </style>
+</head>
+<body>
+    <img src="w_black.png" id="mask">
+    <img src="background.png" id="bg">
+    <canvas id="canvas"></canvas>
+    <div id="controls">
+        <div><label for="amount">Blur</label><input type="range" id="amount" min="0" max="1" step="0.001" value="0"></div>
+        <div><label for="angle">Angle</label><input type="range" id="angle" min="0" max="6.2831853072" step="0.001" value="0"></div>
+        <div><label for="opacity">Opacity</label><input type="range" id="opacity" min="0" max="1" step="0.001" value="0"></div>
+        <div><label for="transition">Transition</label><input type="range" id="transition" min="0" max="1" step="0.001" value="0"></div>
+        <div><label for="smoothness">Smoothness</label><input type="range" id="smoothness" min="0" max="1" step="0.001" value="0"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.15.0/TweenMax.min.js"></script>
+    <script src="dat.gui.min.js"></script>
+    <script src="require.js"></script>
+    <script>
+        $(window).resize(function () {
+            $("#canvas").attr("width", window.innerWidth);
+            $("#canvas").attr("height", window.innerHeight);
+        });
+
+        $("#canvas").attr("width", window.innerWidth);
+        $("#canvas").attr("height", window.innerHeight);
+
+        var seriously, // the main object that holds the entire composition
+            dirblur,
+            target, // a wrapper object for our target canvas
+            blend,
+            reformatBG,
+            reformatAll,
+            transformAll,
+            maskblend,
+            mask = document.createElement('canvas'),
+            ctx = mask.getContext('2d');
+
+        require.config({
+            baseUrl: './'
+        });
+
+        require([
+            'seriously',
+            'seriously.blend',
+            'seriously.gradientwipe',
+            'seriously.simplex',
+            'vectorblur'
+        ], function (Seriously) {
+            seriously = new Seriously();
+            target = seriously.target('#canvas');
+
+            // directional blur
+            dirblur = seriously.effect('vectorblur');
+            dirblur.amount = '#amount';
+            dirblur.angle = '#angle';
+
+            // draw mask
+            mask.width = target.width;
+            mask.height = target.height;
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, target.width, target.height);
+
+            maskblend         = seriously.effect('blend');
+            maskblend.opacity = 1;
+            maskblend.mode    = 'normal';
+
+            // gradient wipe
+            gradientwipe = seriously.effect('gradientwipe');
+            gradientwipe.gradient = maskblend;
+            gradientwipe.transition = 0.975;
+            gradientwipe.smoothness = values.smoothness;
+
+            // translate BG
+            reformatBG = seriously.transform();
+            reformatBG.translateX = -350;
+
+            // blending BG + mask
+            blend         = seriously.effect('blend');
+            blend.opacity = 0;
+            blend.mode    = 'normal';
+
+            // translate all
+            reformatAll = seriously.transform();
+            reformatAll.translateX = -350;
+
+            // transform for BG + mask
+            transformAll = seriously.transform('2d');
+            transformAll.translate(700, values.translateY);
+            transformAll.scale(values.scale);
+
+            // connecting nodes
+            dirblur.source = '#mask';
+
+            maskblend.bottom  = mask;
+            maskblend.top     = dirblur;
+
+            reformatBG.source = '#bg';
+            gradientwipe.source = reformatBG;
+
+            blend.bottom  = gradientwipe;
+            blend.top     = "";
+
+            reformatAll.source = blend;
+            transformAll.source = reformatAll;
+
+            target.source = transformAll;
+
+            // render
+            seriously.go(function (now) {
+                transformAll.translate(700, values.translateY);
+                transformAll.scale(values.scale);
+
+                gradientwipe.smoothness = values.smoothness;
+            });
+        });
+
+        var gui = new dat.GUI();
+        gui.add(this, "tween");
+
+        var values = {
+            scale: 1,
+            smoothness:0
+        };
+
+        function tween () {
+            var timeline = new TimelineMax();
+
+            timeline.fromTo(values, 2, { scale: 1 }, { scale: 2, ease: Expo.easeIn }, 0);
+            //timeline.fromTo(dirblur, 1, { amount: 0 }, { amount: 0.25, ease: Expo.easeInOut }, 0);
+            timeline.fromTo(values, 1, { smoothness: 0 }, { smoothness: 1, ease: Expo.easeIn });
+        }
+
+        function setupStats () {
+            var script = document.createElement("script");
+            script.src = "https://rawgit.com/mrdoob/stats.js/master/build/stats.min.js";
+            script.onload = function () {
+                var stats = new Stats();
+                stats.dom.style.left = "auto";
+                stats.dom.style.right = "0px";
+                stats.dom.style.width = "100px";
+                stats.showPanel(0);
+                document.body.appendChild(stats.dom);
+
+                requestAnimationFrame(function loop () {
+                    stats.update();
+                    requestAnimationFrame(loop);
+                });
+            };
+
+            document.head.appendChild(script);
+        }
+
+        setupStats();
+    </script>
+</body>
+</html>

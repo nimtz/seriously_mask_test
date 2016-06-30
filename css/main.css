@@ -1,0 +1,14 @@
+body {
+    background      : url("../image/slideshow_bg_v4_5.jpg") no-repeat;
+    background-size : cover;
+}
+img {
+    display         :  none;
+}
+#fg {
+    width           : 100%;
+    height          : auto;
+}
+#canvas {
+    position        : absolute;
+}
