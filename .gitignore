@@ -1,0 +1,4 @@
+node_modules
+sync.sh
+.DS_Store
+.build
