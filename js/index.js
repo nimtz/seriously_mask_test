@@ -7,7 +7,10 @@
     var Expo            = window.Expo;
     var stats;
 
-    var val             = document.getElementById("translate_value");
+    var val             = document.createTextNode("");
+    var val_div         = document.getElementById("translate_value");
+
+    val_div.appendChild(val);
 
     // state
     var state           = {
@@ -150,7 +153,7 @@
         timeline = null;
     }
     function updateTranslateValue () {
-        val.textContent = state.translate.toFixed(3);
+        val.nodeValue = state.translate.toFixed(3);
     }
     function setupGUI () {
         var gui = new window.dat.GUI();
