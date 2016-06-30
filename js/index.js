@@ -7,10 +7,13 @@
     var Expo            = window.Expo;
     var stats;
 
-    var val             = document.createTextNode("");
-    var val_div         = document.getElementById("translate_value");
+    var translate_val   = document.createTextNode("");
+    var scale_val       = document.createTextNode("");
+    var trns_div        = document.getElementById("translate_value");
+    var scale_div       = document.getElementById("scale_value");
 
-    val_div.appendChild(val);
+    trns_div.appendChild(translate_val);
+    scale_div.appendChild(scale_val);
 
     // state
     var state           = {
@@ -48,7 +51,8 @@
     init();
 
     function init () {
-        val.innerText           = state.translate;
+        updateScaleValue();
+        updateTranslateValue();
 
         target                  = seriously.target("#canvas");
         target.width            = window.innerWidth;
@@ -108,6 +112,7 @@
                 transformNode.translate(state.translate, 0);
             }
             if (state.do_scale) {
+                updateScaleValue();
                 transformNode.scale(state.scale);
             }
         }
@@ -153,7 +158,10 @@
         timeline = null;
     }
     function updateTranslateValue () {
-        val.nodeValue = state.translate.toFixed(3);
+        translate_val.nodeValue = state.translate.toFixed(3);
+    }
+    function updateScaleValue () {
+        scale_val.nodeValue = state.scale.toFixed(3);
     }
     function setupGUI () {
         var gui = new window.dat.GUI();
@@ -165,8 +173,8 @@
         // GUI Setup
         gui.add(state, "duration", 1, 10);
 
-        gui.add(state, "start_scale", 0.001, 2);
-        gui.add(state, "end_scale", 0.001, 2);
+        gui.add(state, "start_scale", 0.001, 20);
+        gui.add(state, "end_scale", 0.001, 20);
 
         gui.add(state, "start_translate", -500, 500);
         gui.add(state, "end_translate", -500, 500);

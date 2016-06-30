@@ -5,6 +5,14 @@ body {
 img {
     display         :  none;
 }
+.input_number {
+    color           : white;
+    background      : black;
+    font-family     : courier;
+    font-size       : 38px;
+    position        : absolute;
+    z-index         : 1;
+}
 #fg {
     width           : 100%;
     height          : auto;
@@ -13,12 +21,10 @@ img {
     position        : absolute;
 }
 #translate_value {
-    color           : white;
-    background      : black;
-    font-family     : courier;
-    font-size       : 64px;
-    position        : absolute;
     bottom          : 20px;
     left            : 20px;
-    z-index         : 1;{}
+}
+#scale_value {
+    bottom          : 60px;
+    left            : 20px;
 }
